@@ -23,7 +23,7 @@ func getInventoryResource(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 func Server() {
     router := httprouter.New()
-    router.GET("/inventory/resource/:id", getinventoryResource)
+    router.GET("/inventory/resource/:id", getInventoryResource)
     router.GET("/", index)
     router.GET("/hello/:name", hello)
 
