@@ -1,9 +1,16 @@
+store: #Default store if this configured other can be only use to override the default one
+  file:
+    bucket: "/etc/inventory"
+  s3:
+    bucket: "my_bucket"
 inventory:
   store:
     file:
       bucket: "/etc/inventory"
     s3:
       bucket: "my_bucket"
+    postgresql:
+      bucket: "myhost:port/mydb"
   master: "my_master_inventory_host" # only usefull when main inventory is ro, and some handler are not
   #views are pre evaluated aggregations, they are stored and rebuild each times inventory is saved
   views:
@@ -17,3 +24,16 @@ inventory:
         - "ENV"
         - "Name"
       name: "my-company-resource-view"
+providers:
+  aws:
+    store:
+      file:
+        bucket: "/etc/inventory"
+      s3:
+        bucket: my_bucket
+    services:
+      - ec2
+      - rds
+  gcp:
+    store:
+      file: "/etc/inventory"
