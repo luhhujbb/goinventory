@@ -5,4 +5,5 @@ type Store struct {
     Bucket string
     Type string
     Atomic bool
+    Format string
 }
