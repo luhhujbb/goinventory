@@ -42,3 +42,42 @@ func LoadFromStore(store ivtype.Store) (interface{},error){
         }
     }
 }
+
+func ConfToStore(storesspecs *map[string]map[string]string,defaultkey string) []ivtype.Store{
+    resStore := make([]ivtype.Store,len(*storesspecs))
+    idx := 0
+    for storetype, storespec := range *storesspecs {
+        var key string
+        var format string
+        if storespec["key"] == "" {
+            key = defaultkey
+        } else {
+            key = storespec["key"]
+        }
+        if storespec["format"] == "" {
+            format = "yaml"
+        } else {
+            format = storespec["format"]
+        }
+        switch storetype {
+        case "s3":
+            resStore[idx] = ivtype.Store{
+                Key: key,
+                Bucket: storespec["bucket"],
+                Type: "s3",
+                Atomic: false, // Indicate what is send
+                Format: format,
+            }
+        case "file":
+            resStore[idx] = ivtype.Store{
+                Key: key,
+                Bucket: storespec["bucket"],
+                Type: "file",
+                Atomic: false, // Indicate what is send
+                Format: format,
+            }
+        }
+        idx++
+    }
+    return resStore
+}

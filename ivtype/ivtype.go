@@ -12,3 +12,8 @@ type Update struct {
     Id string //only for atomic update
     Body string
 }
+
+type ApiResponse struct {
+    State string "json: state"
+    Data interface{} "json: data"
+}

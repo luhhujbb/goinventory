@@ -1,4 +1,4 @@
-package goinventory
+package inventory
 
 import (
     "github.com/luhhujbb/goinventory/ivtype"
@@ -7,8 +7,10 @@ import (
 
 /* main inventory declaration */
 var inventory map[string]map[string]string
+var stores []ivtype.Store
+const defaultKey = "inventory"
 
-func loadInventory (stores []ivtype.Store){
+func loadInventory (){
     for _ , st := range stores {
         ivFromStore, err := store.LoadFromStore(st)
         if err != nil {
@@ -19,6 +21,17 @@ func loadInventory (stores []ivtype.Store){
     }
 }
 
-func GetResource(id string) map[string]string{
-    return inventory[id]
+func GetResource(id string) *map[string]string{
+    resource := inventory[id]
+    return &resource
+}
+
+func GetInventory() *map[string]map[string]string{
+    return &inventory
+}
+
+func ConfigureInventory(config interface{}){
+    tconf := config.(map[string]interface{})
+    tsto := tconf["store"].(map[string]map[string]string)
+    stores = store.ConfToStore(&tsto,"inventory")
 }
