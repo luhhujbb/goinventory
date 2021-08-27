@@ -4,10 +4,13 @@ import (
     api "github.com/luhhujbb/goinventory/api"
     viper "github.com/spf13/viper"
     inventory "github.com/luhhujbb/goinventory/inventory"
+    "log"
+    "os"
 )
 
 func setDefaultConfig(){
     viper.SetDefault("store.file.bucket","/etc/inventory")
+    viper.SetDefault("store.s3.region","eu-west-1")
 }
 
 func main (){
@@ -15,6 +18,20 @@ func main (){
     viper.AddConfigPath("/etc/inventory/")   // path to look for the config file in
     viper.AddConfigPath("$HOME/.inventory")  // call multiple times to add many search paths
     viper.AddConfigPath(".")
-    inventory.ConfigureInventory(viper.Get("inventory"))
+    setDefaultConfig()
+    if err := viper.ReadInConfig(); err != nil {
+    if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+        log.Fatal("configNotFound")
+    } else {
+        // Config file was found but another error was produced
+    }
+    }
+    if os.Getenv("AWS_REGION") == ""{
+        os.Setenv("AWS_REGION", viper.Get("store.s3.region").(string))
+    }
+    if viper.Get("inventory") != nil {
+        log.Print("init inventory")
+        inventory.ConfigureInventory(viper.Get("inventory"))
+    }
     api.Server()
 }

@@ -5,14 +5,17 @@ import (
     "net/http"
     "github.com/julienschmidt/httprouter"
     "github.com/luhhujbb/goinventory/inventory"
-    "github.com/luhhujbb/goinventory/ivtype"
     "encoding/json"
+    "log"
 )
 
-
+type ApiResponse struct {
+    State string "json: state"
+    Data interface{} "json: data"
+}
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-    fmt.Fprint(w, "Welcome!\n")
+    fmt.Fprint(w, "Welcome To Inventory!\n")
 }
 
 func hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -21,7 +24,8 @@ func hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func getInventoryResource(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     resource := *inventory.GetResource(ps.ByName("id"))
-    response := ivtype.ApiResponse{State: "success", Data: resource}
+    log.Print(resource)
+    response := ApiResponse{State: "success", Data: resource}
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
 }

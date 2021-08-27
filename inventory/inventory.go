@@ -3,19 +3,21 @@ package inventory
 import (
     "github.com/luhhujbb/goinventory/ivtype"
     "github.com/luhhujbb/goinventory/store"
+    "github.com/luhhujbb/goinventory/utils"
+    "log"
 )
 
 /* main inventory declaration */
 var inventory map[string]map[string]string
 var stores []ivtype.Store
-const defaultKey = "inventory"
+const defaultKey = "resources.yml"
 
 func loadInventory (){
     for _ , st := range stores {
         ivFromStore, err := store.LoadFromStore(st)
         if err != nil {
             //need to add payload decoder whent format is != from ""
-            inventory = ivFromStore.(map[string]map[string]string)
+            inventory = utils.InterfaceToIDDict(ivFromStore)
             break
         }
     }
@@ -32,6 +34,8 @@ func GetInventory() *map[string]map[string]string{
 
 func ConfigureInventory(config interface{}){
     tconf := config.(map[string]interface{})
-    tsto := tconf["store"].(map[string]map[string]string)
-    stores = store.ConfToStore(&tsto,"inventory")
+    tsto := utils.InterfaceToIDDict(tconf["store"])
+    stores = store.ConfToStore(&tsto, defaultKey)
+    log.Print(stores)
+    loadInventory()
 }
