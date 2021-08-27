@@ -12,6 +12,7 @@ func loadInventory (stores []ivtype.Store){
     for _ , st := range stores {
         ivFromStore, err := store.LoadFromStore(st)
         if err != nil {
+            //need to add payload decoder whent format is != from ""
             inventory = ivFromStore.(map[string]map[string]string)
             break
         }

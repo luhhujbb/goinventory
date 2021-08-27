@@ -5,12 +5,14 @@ import (
     "log"
     "github.com/luhhujbb/goinventory/ivtype"
     "github.com/aws/aws-sdk-go-v2/config"
+    "github.com/aws/aws-sdk-go-v2/aws"
     "github.com/aws/aws-sdk-go-v2/service/s3"
+    "bytes"
 )
 
 var s3Client s3.Client
 
-func Load(store ivtype.Store) (interface{}, error){
+func Load(store ivtype.Store) (string, error){
     ctx := context.TODO()
     cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
@@ -20,9 +22,18 @@ func Load(store ivtype.Store) (interface{}, error){
         s3Client = *s3.NewFromConfig(cfg)
     }
     input := &s3.GetObjectInput{
-        Bucket: &store.Bucket,
-        Key: &store.Key,
+        Bucket: aws.String(store.Bucket),
+        Key: aws.String(store.Key),
     }
     resp,err := s3Client.GetObject(ctx,input)
-    return resp, err
+    if err != nil {
+        return "", err
+    } else {
+        //put body into a string
+        buf := new(bytes.Buffer)
+        buf.ReadFrom(resp.Body)
+        newStr := buf.String()
+        //return string from s3 and eventual error
+        return newStr, err
+    }
 }
