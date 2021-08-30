@@ -8,33 +8,34 @@ import (
 )
 
 /* main inventory declaration */
-var inventory map[string]map[string]string
+var inventory map[string]map[string]interface{}
 var stores []ivtype.Store
 const defaultKey = "resources.yml"
 
 func loadInventory (){
     for _ , st := range stores {
         ivFromStore, err := store.LoadFromStore(st)
-        if err != nil {
-            //need to add payload decoder whent format is != from ""
-            inventory = utils.InterfaceToIDDict(ivFromStore)
+        if err == nil {
+            inventory = utils.InterfaceToIDDictYaml(ivFromStore)
             break
+        } else {
+            log.Print(err)
         }
     }
 }
 
-func GetResource(id string) *map[string]string{
+func GetResource(id string) *map[string]interface{}{
     resource := inventory[id]
     return &resource
 }
 
-func GetInventory() *map[string]map[string]string{
+func GetInventory() *map[string]map[string]interface{}{
     return &inventory
 }
 
 func ConfigureInventory(config interface{}){
     tconf := config.(map[string]interface{})
-    tsto := utils.InterfaceToIDDict(tconf["store"])
+    tsto := utils.InterfaceToIDDictViper(tconf["store"])
     stores = store.ConfToStore(&tsto, defaultKey)
     log.Print(stores)
     loadInventory()
