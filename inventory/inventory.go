@@ -7,6 +7,16 @@ import (
     "log"
 )
 
+type TagFilter struct {
+    Tags []Tag `json:"tags"`
+}
+
+type Tag struct {
+    Name string `json:"name"`
+    Value []string `json:"value"`
+    Not bool `json:"not,omitempty"`
+}
+
 /* main inventory declaration */
 var inventory map[string]map[string]interface{}
 var stores []ivtype.Store
@@ -31,6 +41,14 @@ func GetResource(id string) *map[string]interface{}{
 
 func GetInventory() *map[string]map[string]interface{}{
     return &inventory
+}
+
+func GetFilteredInventory(tagFilter TagFilter) *map[string]map[string]interface{}{
+    return &inventory
+}
+
+func FastSync(){
+    loadInventory()
 }
 
 func ConfigureInventory(config interface{}){
