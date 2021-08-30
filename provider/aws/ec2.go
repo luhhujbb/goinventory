@@ -1,3 +1,3 @@
 package aws
 
-const EC2DefaultKey = "aws/ec2.yml"
+const EC2DefaultKey = "ec2.yml"
