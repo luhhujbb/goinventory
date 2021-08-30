@@ -5,6 +5,7 @@ import (
     "github.com/julienschmidt/httprouter"
     "github.com/luhhujbb/goinventory/inventory"
     "encoding/json"
+    "log"
 )
 
 
@@ -28,10 +29,8 @@ func getFilteredInventory(w http.ResponseWriter, r *http.Request, ps httprouter.
     var response ApiResponse
     err := json.NewDecoder(r.Body).Decode(&tagFilter)
     if err != nil {
-        response = ApiResponse{State: "error", Data: nil, Message: "no tags defined for filtering"}
-        w.Header().Set("Content-Type", "application/json")
-        json.NewEncoder(w).Encode(response)
-        http.Error(w, err.Error(), http.StatusBadRequest)
+        log.Print(err)
+        getInventory(w,r,ps)
     } else {
         iv := *inventory.GetFilteredInventory(tagFilter)
         response = ApiResponse{State: "success", Data: iv}
