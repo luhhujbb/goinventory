@@ -4,6 +4,7 @@ import (
     "context"
     "log"
     "github.com/luhhujbb/goinventory/ivtype"
+    "github.com/luhhujbb/goinventory/utils"
     "github.com/aws/aws-sdk-go-v2/config"
     "github.com/aws/aws-sdk-go-v2/service/s3"
     "bytes"
@@ -20,10 +21,11 @@ func Load(store ivtype.Store) (string, error){
     if s3Client == nil {
         s3Client = s3.NewFromConfig(cfg)
     }
+    key := utils.KeyWithExtension(store.Key,store.Format)
 
     input := &s3.GetObjectInput{
         Bucket: &store.Bucket,
-        Key: &store.Key,
+        Key: &key,
     }
 
     resp,err := s3Client.GetObject(ctx,input)

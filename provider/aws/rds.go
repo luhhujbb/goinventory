@@ -1,3 +1,3 @@
 package aws
 
-const RDSDefaultKey = "rds.yml"
+const RDSDefaultKey = "rds"

@@ -20,7 +20,7 @@ type Tag struct {
 /* main inventory declaration */
 var inventory map[string]map[string]string
 var stores []ivtype.Store
-const defaultKey = "resources.yml"
+const defaultKey = "resources"
 
 func loadInventory (){
     for _ , st := range stores {
@@ -85,4 +85,5 @@ func ConfigureInventory(config interface{}){
     stores = store.ConfToStore(&tsto, defaultKey)
     log.Print(stores)
     loadInventory()
+    log.Print("Inventory loaded")
 }

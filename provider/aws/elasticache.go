@@ -1,3 +1,3 @@
 package aws
 
-const ElasticacheDefaultKey = "elasticache.yml"
+const ElasticacheDefaultKey = "elasticache"

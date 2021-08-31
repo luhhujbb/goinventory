@@ -48,3 +48,11 @@ func Contains(input []string, el string) bool {
     }
     return false
 }
+
+func KeyWithExtension(key string,format string) string {
+    switch format {
+    case "yaml": return key + ".yml"
+    case "json": return key + ".json"
+    default: return key
+    }
+}
