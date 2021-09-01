@@ -18,21 +18,31 @@ type Tag struct {
 }
 
 /* main inventory declaration */
-var inventory map[string]map[string]string
-var stores []ivtype.Store
-const defaultKey = "resources"
+var resources map[string]map[string]string
+var groups map[string]map[string]string
+var aliases map[string]map[string]string
+var stores = make(map[string][]ivtype.Store)
+const defaultResourceKey = "resources"
+const defaultGroupKey = "groups"
+const defaultAliasKey = "alias"
 
 func loadInventory (){
-    for _ , st := range stores {
-        ivFromStore, err := store.LoadFromStore(st)
-        if err == nil {
-            inventory = utils.InterfaceToIDDictYaml(ivFromStore)
-            break
-        } else {
-            log.Print(err)
+    for entityType , ivstores := range stores{
+        for _ , st := range ivstores {
+            ivFromStore, err := store.LoadFromStore(st)
+            if err == nil {
+                switch entityType {
+                    case "resource": resources = utils.InterfaceToIDDictYaml(ivFromStore)
+                    case "group": groups = utils.InterfaceToIDDictYaml(ivFromStore)
+                    case "alias": aliases = utils.InterfaceToIDDictYaml(ivFromStore)
+                }
+                break
+                } else {
+                    log.Print(err)
+                }
+            }
         }
     }
-}
 
 func tagMatcher (entity map[string]string, tag Tag) bool {
     var match bool
@@ -56,23 +66,57 @@ func tagsMatcher (entity map[string]string, tags []Tag) bool {
     return true
 }
 
+//Filtered Entities
+func getFilteredEntities(entities map[string]map[string]string,tagFilter TagFilter) *map[string]map[string]string{
+    filteredEntities := make(map[string]map[string]string)
+    for k,v := range entities {
+        if tagsMatcher(v,tagFilter.Tags) {
+            filteredEntities[k] = v
+        }
+    }
+    return &filteredEntities
+}
+
+//Resource(s) Getter
 func GetResource(id string) *map[string]string{
-    resource := inventory[id]
+    resource := resources[id]
     return &resource
 }
 
-func GetInventory() *map[string]map[string]string{
-    return &inventory
+func GetResources() *map[string]map[string]string{
+    return &resources
 }
 
-func GetFilteredInventory(tagFilter TagFilter) *map[string]map[string]string{
-    filteredInventory := make(map[string]map[string]string)
-    for k,v := range inventory {
-        if tagsMatcher(v,tagFilter.Tags) {
-            filteredInventory[k] = v
-        }
-    }
-    return &filteredInventory
+func GetFilteredResources(tagFilter TagFilter) *map[string]map[string]string{
+    return getFilteredEntities(resources, tagFilter)
+}
+
+//Group(s) Getter
+func GetGroup(id string) *map[string]string{
+    group := groups[id]
+    return &group
+}
+
+func GetGroups() *map[string]map[string]string{
+    return &groups
+}
+
+func GetFilteredGroups(tagFilter TagFilter) *map[string]map[string]string{
+    return getFilteredEntities(groups, tagFilter)
+}
+
+//Group(s) Getter
+func GetAlias(id string) *map[string]string{
+    alias := aliases[id]
+    return &alias
+}
+
+func GetAliases() *map[string]map[string]string{
+    return &aliases
+}
+
+func GetFilteredAliases(tagFilter TagFilter) *map[string]map[string]string{
+    return getFilteredEntities(aliases, tagFilter)
 }
 
 func FastSync(){
@@ -82,7 +126,9 @@ func FastSync(){
 func ConfigureInventory(config interface{}){
     tconf := config.(map[string]interface{})
     tsto := utils.InterfaceToIDDictViper(tconf["store"])
-    stores = store.ConfToStore(&tsto, defaultKey)
+    stores["resource"] = store.ConfToStore(&tsto,defaultResourceKey)
+    stores["group"] = store.ConfToStore(&tsto,defaultGroupKey)
+    stores["alias"] = store.ConfToStore(&tsto,defaultAliasKey)
     log.Print(stores)
     loadInventory()
     log.Print("Inventory loaded")

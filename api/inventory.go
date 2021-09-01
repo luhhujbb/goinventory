@@ -18,7 +18,7 @@ func getInventoryResource(w http.ResponseWriter, r *http.Request, ps httprouter.
 }
 
 func getInventory(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-    iv := *inventory.GetInventory()
+    iv := *inventory.GetResources()
     response := ApiResponse{State: "success", Data: iv}
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
@@ -32,7 +32,7 @@ func getFilteredInventory(w http.ResponseWriter, r *http.Request, ps httprouter.
         log.Print(err)
         getInventory(w,r,ps)
     } else {
-        iv := *inventory.GetFilteredInventory(tagFilter)
+        iv := *inventory.GetFilteredResources(tagFilter)
         response = ApiResponse{State: "success", Data: iv}
         w.Header().Set("Content-Type", "application/json")
         json.NewEncoder(w).Encode(response)
