@@ -8,13 +8,18 @@ import (
     "log"
 )
 
-
-
-func getInventoryResource(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-    resource := *inventory.GetResource(ps.ByName("id"))
-    response := ApiResponse{State: "success", Data: resource}
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(response)
+func makeEntitityGetter(entityType string) func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+    return func (w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+        var entity map[string]string
+        switch entityType {
+            case "resource": entity = *inventory.GetResource(ps.ByName("id"))
+            case "group": entity = *inventory.GetGroup(ps.ByName("id"))
+            case "alias": entity = *inventory.GetAlias(ps.ByName("id"))
+        }
+        response := ApiResponse{State: "success", Data: entity}
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(response)
+    }
 }
 
 func getInventory(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -50,7 +55,7 @@ func fastSync(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func ConfigureInventoryRoute(router *httprouter.Router){
     router.GET("/inventory/fsync", fastSync)
-    router.GET("/inventory/resource/:id", getInventoryResource)
+    router.GET("/inventory/resource/:id", makeEntitityGetter("resource"))
     router.GET("/inventory/resource", getInventory)
     router.POST("/inventory/resource", getFilteredInventory)
 }
