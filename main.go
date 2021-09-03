@@ -4,6 +4,7 @@ import (
     api "github.com/luhhujbb/goinventory/api"
     viper "github.com/spf13/viper"
     inventory "github.com/luhhujbb/goinventory/inventory"
+    aws "github.com/luhhujbb/goinventory/provider/aws"
     "log"
     "os"
 )
@@ -32,6 +33,10 @@ func main (){
     if viper.Get("inventory") != nil {
         log.Print("init inventory")
         inventory.ConfigureInventory(viper.Get("inventory"))
+    }
+    if viper.Get("aws") != nil {
+        log.Print("init aws")
+        aws.ConfigureAWS(viper.Get("inventory"))
     }
     api.Server()
 }
